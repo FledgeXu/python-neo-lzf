@@ -29,11 +29,12 @@ jobs:
         run: python -m cibuildwheel --output-dir dist
         env:
           CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_ARCHS: universal2
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: built-wheels
+          name: built-wheels-${{ matrix.os }}-${{ github.run_id }}
           path: dist
 
   publish:
@@ -47,13 +48,26 @@ jobs:
       url: https://pypi.org/p/python-neo-lzf
 
     steps:
-      - name: Download built wheels
+      - name: Download Ubuntu wheels
         uses: actions/download-artifact@v4
         with:
-          name: built-wheels
+          name: built-wheels-ubuntu-latest-${{ github.run_id }}
+          path: dist
+
+      - name: Download Windows wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: built-wheels-windows-latest-${{ github.run_id }}
+          path: dist
+
+      - name: Download macOS wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: built-wheels-macos-latest-${{ github.run_id }}
           path: dist
 
       - name: Publish to PyPI via Trusted Publisher
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages_dir: dist
+
