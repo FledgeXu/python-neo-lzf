@@ -1,14 +1,18 @@
 import sys
+from pathlib import Path
 
 from setuptools import Extension, setup
 
-VERSION = (0, 3, 0)
+VERSION = (0, 3, 1)
 
 compile_args = ["/W3"] if sys.platform == "win32" else ["-Wall"]
+long_description = Path("README.txt").read_text(encoding="utf-8")
 
 setup(
     name="python-neo-lzf",
     description="A fork of python-lzf with pre-built wheel files.",
+    long_description=long_description,
+    long_description_content_type="text/plain",
     version=".".join(map(str, VERSION)),
     author="Fledge Shiu",
     author_email="xzk0701@gmail.com",
