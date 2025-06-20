@@ -1,0 +1,43 @@
+name: Build and Publish with cibuildwheel
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-publish:
+    name: Build wheels and upload to PyPI via OIDC
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    permissions:
+      id-token: write  # Required for PyPI Trusted Publisher (OIDC)
+      contents: read
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/python-neo-lzf
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install cibuildwheel
+        run: python -m pip install --upgrade cibuildwheel
+
+      - name: Build wheels with cibuildwheel
+        run: cibuildwheel --output-dir dist
+        env:
+          CIBW_BUILD: "cp37-* cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_BUILD_VERBOSITY: 1
+
+      - name: Publish to PyPI via OIDC
+        uses: pypa/gh-action-pypi-publish@release/v1
