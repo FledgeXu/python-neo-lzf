@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install cibuildwheel
-        run: python -m pip install 'cibuildwheel<3'
+        run: python -m pip install 'cibuildwheel==3.2.0'
 
       - name: Build wheels with cibuildwheel
         run: python -m cibuildwheel --output-dir dist
