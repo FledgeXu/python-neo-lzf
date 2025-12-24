@@ -1,9 +1,6 @@
 name: Build and Publish to PyPI
 
-on:
-  push:
-    tags:
-      - "v*.*.*"
+on: [ push, pull_request ]
 
 jobs:
   build:
@@ -48,9 +45,33 @@ jobs:
           name: built-wheels-${{ matrix.os }}-${{ github.run_id }}
           path: dist
 
+  build-sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build
+        run: python -m pip install build
+
+      - name: Build sdist
+        run: python -m build --sdist
+
+      - name: Upload sdist as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist-${{ github.run_id }}
+          path: dist
+
   publish:
     name: Publish to PyPI
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -77,8 +98,13 @@ jobs:
           name: built-wheels-macos-latest-${{ github.run_id }}
           path: dist
 
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-${{github.run_id}}
+          path: dist
+
       - name: Publish to PyPI via Trusted Publisher
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
-
