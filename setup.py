@@ -3,7 +3,7 @@ from pathlib import Path
 
 from setuptools import Extension, setup
 
-VERSION = (0, 3, 4)
+VERSION = (0, 3, 5)
 
 compile_args = ["/W3"] if sys.platform == "win32" else ["-Wall"]
 long_description = Path("README.txt").read_text(encoding="utf-8")
