@@ -67,7 +67,6 @@ jobs:
         with:
           name: sdist-${{ github.run_id }}
           path: dist
-
   publish:
     name: Publish to PyPI
     needs: build
